@@ -28,7 +28,21 @@ env:
   IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
 
 jobs:
+  config:
+    outputs:
+      revision_name: ${{ steps.tags.outputs.revision_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checktout
+        uses: actions/checkout@v3
+
+      - name: tags
+        id: tags
+        run: echo "revision_name=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
   migrate:
+    needs:
+      - config
     runs-on: ubuntu-latest
     steps:
       - name: Checktout
@@ -69,7 +83,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    needs: migrate
+    needs:
+      - migrate
+      - config
 
     permissions:
       contents: 'read'
@@ -99,7 +115,7 @@ jobs:
           image: ${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest
           region: ${{ env.GCP_REGION }}
           service: ${{ env.GCP_CLOUD_RUN_SERVICE_NAME }}
-          suffix: ${GITHUB_SHA::7}
+          suffix: ${{ needs.config.outputs.revision_name }}
           flags: |
             --concurrency=200
             --max-instances=10
