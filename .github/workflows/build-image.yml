@@ -2,7 +2,7 @@ name: Build
 
 on:
   workflow_call:
-    secrets:
+    secrets: # workflow_call の時に secrets の扱いに若干ハマった https://docs.github.com/ja/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callsecrets
       WORKLOAD_IDENTITY_PROVIDER:
         required: true
       SERVICE_ACCOUNT:
@@ -35,7 +35,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-      pull-requests: 'read'
 
     steps:
       - name: Checkout
