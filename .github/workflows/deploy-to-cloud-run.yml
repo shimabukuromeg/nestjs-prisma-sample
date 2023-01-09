@@ -1,0 +1,109 @@
+name: Deploy to Cloud Run
+
+on:
+  workflow_call:
+    secrets: # workflow_call の時に secrets の扱いに若干ハマった https://docs.github.com/ja/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callsecrets
+      WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+      SERVICE_ACCOUNT:
+        required: true
+      RUN_SERVICE_ACCOUNT:
+        required: true
+      PROJECT_ID:
+        required: true
+    inputs:
+      image_tag:
+        type: "string"
+        description: "デプロイするイメージ"
+        required: true
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+  RUN_SERVICE_ACCOUNT: ${{ secrets.RUN_SERVICE_ACCOUNT }}
+  VPC_CONNECTOR: "vpc-con"
+  GCP_REGION: asia-northeast1
+  GCP_CLOUD_RUN_SERVICE_NAME: "api"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checktout
+        uses: actions/checkout@v3
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+          access_token_lifetime: 1200s
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          install_components: 'beta'
+
+      - name: "Run migration"
+        id: migrate
+        run: |
+            gcloud config set run/region $GCP_REGION
+            set +e
+            gcloud beta run jobs describe migration --quiet >/dev/null
+            job_exists_check=$?
+            set -e
+            if [ $job_exists_check -eq 0 ]; then
+              jobs_cmd="update"
+            else
+              jobs_cmd="create"
+            fi
+            echo ": $jobs_cmd a job"
+
+            gcloud beta run jobs $jobs_cmd migration --image="${{ inputs.image_tag }}" --max-retries=1 --args="yarn,prisma,migrate,deploy" --service-account="$RUN_SERVICE_ACCOUNT" --vpc-connector="$VPC_CONNECTOR" --set-secrets="DATABASE_URL=DATABASE_URL:latest"
+            gcloud beta run jobs execute migration --wait --format=json
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: migrate
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+          access_token_lifetime: 1200s
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: CloudRun Deploy
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          image: ${{ inputs.image_tag }}
+          region: ${{ env.GCP_REGION }}
+          service: ${{ env.GCP_CLOUD_RUN_SERVICE_NAME }}
+          suffix: ${GITHUB_SHA::7}
+          flags: |
+            --concurrency=200
+            --max-instances=10
+            --min-instances=1
+            --cpu=1
+            --memory=640Mi
+          secrets:
+            DATABASE_URL=DATABASE_URL:latest
