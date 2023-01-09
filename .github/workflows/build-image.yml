@@ -1,0 +1,65 @@
+name: Build
+
+on:
+  workflow_call:
+    outputs:
+      image_tag:
+        description: "ビルドしたイメージのタグ"
+        value: ${{ jobs.build-push.outputs.image_tag }}
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+env:
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+  IMAGE_HOST: ${{ secrets.IMAGE_HOST }}
+  IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: "${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest"
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      pull-requests: 'read'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+          access_token_lifetime: 1200s
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Docker Setup
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Authorize Docker push
+        id: authorize-docker-push
+        shell: bash
+        run: gcloud auth configure-docker ${{ env.IMAGE_HOST }}
+
+      - name: Docker Image Build and Push
+        id: docker-build
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: "${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest"
+          build-args: |
+            APP_VERSION=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

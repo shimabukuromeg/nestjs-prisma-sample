@@ -1,0 +1,14 @@
+name: "build-deploy"
+on:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-image:
+    uses: ./.github/workflows/build-image.yml
