@@ -12,3 +12,8 @@ permissions:
 jobs:
   build-image:
     uses: ./.github/workflows/build-image.yml
+    secrets:
+      WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+      IMAGE_HOST: ${{ secrets.IMAGE_HOST }}
+      IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}

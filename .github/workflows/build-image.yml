@@ -2,6 +2,15 @@ name: Build
 
 on:
   workflow_call:
+    secrets:
+      WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+      SERVICE_ACCOUNT:
+        required: true
+      IMAGE_HOST:
+        required: true
+      IMAGE_TAG_BASE:
+        required: true
     outputs:
       image_tag:
         description: "ビルドしたイメージのタグ"
