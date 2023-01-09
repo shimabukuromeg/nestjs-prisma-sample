@@ -11,10 +11,6 @@ on:
         required: true
       IMAGE_TAG_BASE:
         required: true
-    outputs:
-      image_tag:
-        description: "ビルドしたイメージのタグ"
-        value: ${{ jobs.build-push.outputs.image_tag }}
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -29,8 +25,6 @@ env:
 jobs:
   build-push:
     runs-on: ubuntu-latest
-    outputs:
-      image_tag: "${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest"
 
     permissions:
       contents: 'read'

@@ -11,10 +11,9 @@ on:
         required: true
       PROJECT_ID:
         required: true
-    inputs:
-      image_tag:
-        type: "string"
-        description: "デプロイするイメージ"
+      IMAGE_HOST:
+        required: true
+      IMAGE_TAG_BASE:
         required: true
 
 env:
@@ -25,6 +24,8 @@ env:
   VPC_CONNECTOR: "vpc-con"
   GCP_REGION: asia-northeast1
   GCP_CLOUD_RUN_SERVICE_NAME: "api"
+  IMAGE_HOST: ${{ secrets.IMAGE_HOST }}
+  IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
 
 jobs:
   migrate:
@@ -62,7 +63,7 @@ jobs:
             fi
             echo ": $jobs_cmd a job"
 
-            gcloud beta run jobs $jobs_cmd migration --image="${{ inputs.image_tag }}" --max-retries=1 --args="yarn,prisma,migrate,deploy" --service-account="$RUN_SERVICE_ACCOUNT" --vpc-connector="$VPC_CONNECTOR" --set-secrets="DATABASE_URL=DATABASE_URL:latest"
+            gcloud beta run jobs $jobs_cmd migration --image="${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest" --max-retries=1 --args="yarn,prisma,migrate,deploy" --service-account="$RUN_SERVICE_ACCOUNT" --vpc-connector="$VPC_CONNECTOR" --set-secrets="DATABASE_URL=DATABASE_URL:latest"
             gcloud beta run jobs execute migration --wait --format=json
 
   deploy:
@@ -95,7 +96,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v0
         with:
           project_id: ${{ env.PROJECT_ID }}
-          image: ${{ inputs.image_tag }}
+          image: ${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest
           region: ${{ env.GCP_REGION }}
           service: ${{ env.GCP_CLOUD_RUN_SERVICE_NAME }}
           suffix: ${GITHUB_SHA::7}

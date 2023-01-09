@@ -21,10 +21,10 @@ jobs:
   deploy-to-cloud-run:
     uses: ./.github/workflows/deploy-to-cloud-run.yml
     needs: build-image
-    with:
-      image_tag: ${{ needs.build-image.outputs.image_tag }}
     secrets:
       WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
       SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
       RUN_SERVICE_ACCOUNT: ${{ secrets.RUN_SERVICE_ACCOUNT }}
       PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      IMAGE_HOST: ${{ secrets.IMAGE_HOST }}
+      IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
