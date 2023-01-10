@@ -11,8 +11,6 @@ on:
         required: true
       PROJECT_ID:
         required: true
-      IMAGE_HOST:
-        required: true
       IMAGE_TAG_BASE:
         required: true
 
@@ -24,7 +22,7 @@ env:
   VPC_CONNECTOR: "vpc-con"
   GCP_REGION: asia-northeast1
   GCP_CLOUD_RUN_SERVICE_NAME: "api"
-  IMAGE_HOST: ${{ secrets.IMAGE_HOST }}
+  IMAGE_HOST: "asia-northeast1-docker.pkg.dev"
   IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
 
 jobs:

@@ -7,8 +7,6 @@ on:
         required: true
       SERVICE_ACCOUNT:
         required: true
-      IMAGE_HOST:
-        required: true
       IMAGE_TAG_BASE:
         required: true
 
@@ -19,7 +17,7 @@ concurrency:
 env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-  IMAGE_HOST: ${{ secrets.IMAGE_HOST }}
+  IMAGE_HOST: "asia-northeast1-docker.pkg.dev"
   IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
 
 jobs:
