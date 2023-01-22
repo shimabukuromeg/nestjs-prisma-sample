@@ -18,7 +18,7 @@ env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
   IMAGE_HOST: "asia-northeast1-docker.pkg.dev"
-  IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
+  IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }} # 例. プロジェクトID/artifact_registry名/イメージ名
 
 jobs:
   build-push:
