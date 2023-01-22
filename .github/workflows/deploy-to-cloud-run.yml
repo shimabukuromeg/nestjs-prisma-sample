@@ -30,7 +30,7 @@ env:
   GCP_CLOUD_RUN_SERVICE_NAME: "api"
   IMAGE_HOST: "asia-northeast1-docker.pkg.dev"
   IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
-  DATABASE_URL: ${{ secrets.RUN_SERVICE_ACCOUNT }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   migrate:
@@ -66,7 +66,7 @@ jobs:
             fi
             echo ": $jobs_cmd a job"
 
-            gcloud beta run jobs $jobs_cmd migration --image="${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest" --max-retries=1 --args="yarn,prisma,migrate,deploy" --service-account="$RUN_SERVICE_ACCOUNT" --vpc-connector="$VPC_CONNECTOR" --set-secrets="DATABASE_URL=DATABASE_URL:latest"
+            gcloud beta run jobs $jobs_cmd migration --image="${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest" --max-retries=1 --args="yarn,prisma,migrate,deploy" --service-account="$RUN_SERVICE_ACCOUNT" --vpc-connector="$VPC_CONNECTOR" --set-secrets="DATABASE_URL=${{ env.DATABASE_URL }}"
             gcloud beta run jobs execute migration --wait --format=json
 
   deploy:
