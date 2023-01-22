@@ -56,6 +56,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          provenance: false
           tags: "${{ env.IMAGE_HOST }}/${{ env.IMAGE_TAG_BASE }}:latest"
           build-args: |
             APP_VERSION=${{ github.sha }}
