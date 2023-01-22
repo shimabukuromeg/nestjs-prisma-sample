@@ -13,6 +13,8 @@ on:
         required: true
       IMAGE_TAG_BASE:
         required: true
+      DATABASE_URL:
+        required: true
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -28,6 +30,7 @@ env:
   GCP_CLOUD_RUN_SERVICE_NAME: "api"
   IMAGE_HOST: "asia-northeast1-docker.pkg.dev"
   IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
+  DATABASE_URL: ${{ secrets.RUN_SERVICE_ACCOUNT }}
 
 jobs:
   migrate:
@@ -105,4 +108,4 @@ jobs:
             --cpu=1
             --memory=640Mi
           secrets:
-            DATABASE_URL=DATABASE_URL:latest
+            DATABASE_URL=${{ env.DATABASE_URL }}

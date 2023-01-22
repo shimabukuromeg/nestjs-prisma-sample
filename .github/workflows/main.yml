@@ -13,7 +13,9 @@ jobs:
   build-image:
     uses: ./.github/workflows/build-image.yml
     secrets:
-      WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }} # 例. "projects/<プロジェクト番号>/locations/global/workloadIdentityPools/<プールID>/attribute.repository/<GitHubユーザー名>/<GitHubリポジトリ名>"
+      # 例. projects/<プロジェクト番号>/locations/global/workloadIdentityPools/<プールID>/providers/github
+      # projects/999999999999/locations/global/workloadIdentityPools/my-pool-id/providers/github
+      WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
       SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }} # 例. "deploy@example.iam.gserviceaccount.com"
       IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
 
@@ -26,3 +28,4 @@ jobs:
       RUN_SERVICE_ACCOUNT: ${{ secrets.RUN_SERVICE_ACCOUNT }}
       PROJECT_ID: ${{ secrets.PROJECT_ID }}
       IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
