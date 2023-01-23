@@ -17,7 +17,7 @@ jobs:
       # projects/999999999999/locations/global/workloadIdentityPools/my-pool-id/providers/github
       WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
       SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }} # 例. "deploy@example.iam.gserviceaccount.com"
-      IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }}
+      IMAGE_TAG_BASE: ${{ secrets.IMAGE_TAG_BASE }} # 例. プロジェクトID/artifact_registry名/イメージ名
 
   deploy-to-cloud-run:
     uses: ./.github/workflows/deploy-to-cloud-run.yml
