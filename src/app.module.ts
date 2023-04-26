@@ -10,6 +10,7 @@ import {
 import * as winston from 'winston';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { utilities } from 'nest-winston';
 
 const interceptors = [
   {
@@ -31,7 +32,8 @@ const interceptors = [
             severity(),
             errorReport(),
             winston.format.timestamp(),
-            winston.format.json(),
+            configService.get('NODE_ENV') === 'production' ?
+              winston.format.json() : utilities.format.nestLike(),
           ),
         }),
       ],
