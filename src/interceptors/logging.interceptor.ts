@@ -16,11 +16,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
         this.logger.log(`Before...`);
 
-
         const req = context.switchToHttp().getRequest();
-        this.logger.log("リクエスト logger");
-        this.logger.log(req);
-        console.log('リクエスト console.log', req)
 
         const info = `${req.method} ${req.url} for ${req.ip}`;
         this.logger.log(`Started ${info}`);
