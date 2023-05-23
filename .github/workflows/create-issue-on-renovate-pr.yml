@@ -18,7 +18,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: pr.title,
-                body: `Created by #${pr.number}`
+                body: `Created by #${pr.number}`,
                 labels: ['renovate'],
                 assignees: ['shimabukuromeg'],
               };
