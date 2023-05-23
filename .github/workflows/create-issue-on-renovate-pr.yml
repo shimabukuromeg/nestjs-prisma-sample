@@ -21,8 +21,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'Issue for Renovate PR #' + context.issue.number,
-              body: 'Please check the renovate PR #' + context.issue.number
-              labels: ['renovate']
-              assignees: ['shimabukuromeg']
+              body: 'Please check the renovate PR #' + context.issue.number,
+              labels: ['renovate'],
+              assignees: ['shimabukuromeg'],
             };
             github.rest.issues.create(issue);
