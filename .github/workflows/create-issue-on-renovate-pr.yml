@@ -1,7 +1,7 @@
 name: Create Issue on Renovate PR
 on:
   pull_request:
-    types: [opened, labeled]
+    types: [labeled]
 
 jobs:
   create_issue:
