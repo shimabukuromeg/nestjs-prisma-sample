@@ -4,7 +4,7 @@
 $ yarn install
 ```
 
-# DB起動
+# DB 起動
 
 ```bash
 $ docker compose up
@@ -21,4 +21,10 @@ $ yarn start:dev
 
 ```bash
 $ curl http://localhost:3000/posts
+```
+
+jager UI
+
+```
+$ open http://localhost:16686/search
 ```
