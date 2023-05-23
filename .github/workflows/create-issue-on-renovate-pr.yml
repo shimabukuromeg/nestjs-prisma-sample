@@ -9,11 +9,11 @@ jobs:
     steps:
       - name: Check if Renovate PR
         id: check
-        run: echo "::set-output name=isRenovate::$(jq --raw-output .pull_request.labels[].name "$GITHUB_EVENT_PATH" | grep -q 'renovate' && echo 'true' || echo 'false')"
+        run: echo "isRenovate=$(jq --raw-output .pull_request.labels[].name "$GITHUB_EVENT_PATH" | grep -q 'renovate' && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
 
       - name: Create Issue
         if: steps.check.outputs.isRenovate == 'true'
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
