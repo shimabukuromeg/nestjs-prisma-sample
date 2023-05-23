@@ -11,6 +11,6 @@ export class AppService {
   }
 
   getHello(): string {
-    return 'Hello World!';
+    return 'こんにちは！世界！';
   }
 }
