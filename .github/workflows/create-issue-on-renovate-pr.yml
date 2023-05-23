@@ -1,0 +1,26 @@
+name: Create Issue on Renovate PR
+on:
+  pull_request:
+    types: [opened, labeled]
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Renovate PR
+        id: check
+        run: echo "::set-output name=isRenovate::$(jq --raw-output .pull_request.labels[].name "$GITHUB_EVENT_PATH" | grep -q 'renovate' && echo 'true' || echo 'false')"
+
+      - name: Create Issue
+        if: steps.check.outputs.isRenovate == 'true'
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Issue for Renovate PR #' + context.issue.number,
+              body: 'Please check the renovate PR #' + context.issue.number
+            };
+            github.rest.issues.create(issue);
