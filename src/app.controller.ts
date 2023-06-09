@@ -9,11 +9,6 @@ export class AppController {
 
   @Get("/posts")
   getPosts() {
-    this.logger.log("/posts にアクセスされました。")
-
-    this.logger.error(new Error('logger.error: error message'))
-    console.error(new Error('console.error: error message'))
-
     return this.appService.getPosts();
   }
 
