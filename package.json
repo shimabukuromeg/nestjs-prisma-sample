@@ -21,7 +21,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@anchan828/nest-cloud-run-queue-tasks-publisher": "^2.0.45",
+    "@anchan828/nest-cloud-run-queue-worker": "^2.0.45",
     "@google-cloud/opentelemetry-cloud-trace-exporter": "^2.0.0",
+    "@grpc/grpc-js": "^1.8.16",
     "@metinseylan/nestjs-opentelemetry": "^3.0.0",
     "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^2.3.1",

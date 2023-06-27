@@ -14,6 +14,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+  gcloud-tasks-emulator:
+    image: ghcr.io/aertje/cloud-tasks-emulator:latest
+    command: -host 0.0.0.0 -port 8123 -queue "projects/my-sandbox/locations/us-central1/queues/test"
+    ports:
+      - '${TASKS_PORT:-8123}:8123'
   tracing:
     image: 'jaegertracing/all-in-one:latest'
     ports:

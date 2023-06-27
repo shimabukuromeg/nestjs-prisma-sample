@@ -11,6 +11,10 @@ import * as winston from 'winston';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { utilities } from 'nest-winston';
+import { QueueWorkerModule } from "@anchan828/nest-cloud-run-queue-worker";
+import { TasksPublisherModule } from "@anchan828/nest-cloud-run-queue-tasks-publisher";
+import { credentials } from "@grpc/grpc-js";
+import { TasksWorker } from "./processor";
 
 const interceptors = [
   {
@@ -20,29 +24,45 @@ const interceptors = [
 ];
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true,
-  }),
-  WinstonModule.forRootAsync({
-    useFactory: (configService: ConfigService) => ({
-      level: 'info',
-      transports: [
-        new winston.transports.Console({
-          format: winston.format.combine(
-            severity(),
-            errorReport(),
-            winston.format.timestamp(),
-            configService.get('NODE_ENV') === 'production' ?
-              winston.format.json() : utilities.format.nestLike(),
-          ),
-        }),
-      ],
+  imports: [
+    QueueWorkerModule.register(),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
-    inject: [ConfigService],
-  }),
+    WinstonModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        level: 'info',
+        transports: [
+          new winston.transports.Console({
+            format: winston.format.combine(
+              severity(),
+              errorReport(),
+              winston.format.timestamp(),
+              configService.get('NODE_ENV') === 'production' ?
+                winston.format.json() : utilities.format.nestLike(),
+            ),
+          }),
+        ],
+      }),
+      inject: [ConfigService],
+    }),
+    TasksPublisherModule.register({
+      clientConfig: {
+        apiEndpoint: "localhost",
+        port: 8123,
+        projectId: "test",
+        sslCreds: credentials.createInsecure(),
+      },
+      publishConfig: {
+        httpRequest: {
+          url: process.env.WORKER_ENDPOINT,
+        },
+      },
+      queue: "projects/my-sandbox/locations/us-central1/queues/test",
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, ...interceptors],
+  providers: [AppService, PrismaService, TasksWorker, ...interceptors],
 })
 export class AppModule { }
 
