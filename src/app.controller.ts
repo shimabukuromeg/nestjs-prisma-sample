@@ -26,14 +26,10 @@ export class AppController {
 
     const options: PublishOptions = process.env.NODE_ENV === "production" ? {
       httpRequest: {
-        headers: {
-          'Content-Type': 'text/plain', // Set content type to ensure compatibility your application's request parsing
-        },
         httpMethod: 'POST',
-        oidcToken: {
-          serviceAccountEmail: process.env.CLOUD_TASK_SERVICE_ACCOUNT,
-          audience: process.env.CLOUD_TASK_AUDIENCE,
-        },
+        // oidcToken: {
+        //   serviceAccountEmail: process.env.CLOUD_TASK_SERVICE_ACCOUNT,
+        // },
       },
     } : {}
 
