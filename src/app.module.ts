@@ -47,7 +47,7 @@ const interceptors = [
       inject: [ConfigService],
     }),
     TasksPublisherModule.register({
-      clientConfig: {
+      clientConfig: process.env.NODE_ENV === "production" ? {} : {
         apiEndpoint: "localhost",
         port: 8123,
         projectId: "test",
@@ -58,7 +58,7 @@ const interceptors = [
           url: process.env.WORKER_ENDPOINT,
         },
       },
-      queue: "projects/my-sandbox/locations/us-central1/queues/test",
+      queue: process.env.QUEUE_NAME,
     }),
   ],
   controllers: [AppController],
