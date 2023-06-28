@@ -34,6 +34,9 @@ RUN yarn prisma generate
 # Run Layer
 FROM --platform=linux/amd64 node:18-slim as node
 
+RUN apt-get update -y
+RUN apt-get install -y openssl
+
 WORKDIR /app
 
 ENV NODE_ENV=production
