@@ -14,7 +14,8 @@ import { utilities } from 'nest-winston';
 import { QueueWorkerModule } from "@anchan828/nest-cloud-run-queue-worker";
 import { TasksPublisherModule } from "@anchan828/nest-cloud-run-queue-tasks-publisher";
 import { credentials } from "@grpc/grpc-js";
-import { TasksWorker } from "./processor";
+import { TasksWorker, TasksWorker2 } from "./processor";
+import { AuthModule } from './auth/auth.module';
 
 const interceptors = [
   {
@@ -25,7 +26,10 @@ const interceptors = [
 
 @Module({
   imports: [
-    QueueWorkerModule.register(),
+    AuthModule,
+    QueueWorkerModule.register({
+      workerController: null,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -55,14 +59,14 @@ const interceptors = [
       },
       publishConfig: {
         httpRequest: {
-          url: process.env.WORKER_ENDPOINT,
+          url: `${process.env.WORKER_ENDPOINT}/execute`,
         },
       },
       queue: process.env.QUEUE_NAME,
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, TasksWorker, ...interceptors],
+  providers: [AppService, PrismaService, TasksWorker, TasksWorker2, ...interceptors],
 })
 export class AppModule { }
 
