@@ -1,7 +1,7 @@
 ## Installation
 
 ```bash
-$ yarn install
+$ pnpm install
 ```
 
 # DB 起動
@@ -13,8 +13,8 @@ $ docker compose up
 ## アプリ起動
 
 ```bash
-$ yarn prisma migrate reset
-$ yarn start:dev
+$ pnpm prisma migrate reset
+$ pnpm start:dev
 ```
 
 # 動作確認
