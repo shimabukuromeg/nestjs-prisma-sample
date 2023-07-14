@@ -1,6 +1,6 @@
 #==================================================
 # Build Layer
-FROM --platform=linux/amd64 node:18 as build
+FROM --platform=linux/amd64 node:20 as build
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN yarn build
 
 #==================================================
 # Package install Layer
-FROM --platform=linux/amd64 node:18 as node_modules
+FROM --platform=linux/amd64 node:20 as node_modules
 
 WORKDIR /app
 
@@ -32,7 +32,7 @@ RUN yarn prisma generate
 
 #==================================================
 # Run Layer
-FROM --platform=linux/amd64 node:18-slim as node
+FROM --platform=linux/amd64 node:20-slim as node
 
 WORKDIR /app
 
