@@ -4,7 +4,6 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import * as opentelemetry from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import {
-    ConsoleSpanExporter,
     BatchSpanProcessor,
     SpanExporter,
     SpanProcessor,

@@ -1,46 +1,47 @@
-#==================================================
-# Build Layer
-FROM --platform=linux/amd64 node:20 as build
+# Base Image
+FROM node:18-alpine AS base
 
+# Global install pnpm
+RUN npm i -g pnpm
+
+# Create app directory
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+# Dependencies
+FROM base AS dependencies
 
+# A wildcard is used to ensure both package.json AND package-lock.json or pnpm-lock.yaml are copied
+COPY package.json pnpm-lock.yaml ./
+
+# Install app dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy Prisma schema
 COPY prisma ./prisma
+RUN pnpm prisma generate
 
-RUN yarn install --non-interactive --frozen-lockfile
+# Builder
+FROM dependencies AS builder
 
-RUN yarn prisma generate
-
+# Bundle app source
 COPY . .
 
-RUN yarn build
+# Build app
+RUN pnpm build
 
-#==================================================
-# Package install Layer
-FROM --platform=linux/amd64 node:20 as node_modules
+# Production Image
+FROM base AS production
 
-WORKDIR /app
-
-COPY package.json yarn.lock ./
-
-COPY prisma ./prisma
-
-RUN yarn install --non-interactive --frozen-lockfile --prod
-
-RUN yarn prisma generate
-
-#==================================================
-# Run Layer
-FROM --platform=linux/amd64 node:20-slim as node
-
-WORKDIR /app
-
+# Set environment
 ENV NODE_ENV=production
 
-COPY --from=build /app/dist /app/dist
-COPY --from=build /app/prisma /app/prisma
-COPY --from=node_modules /app/package.json /app/yarn.lock ./
-COPY --from=node_modules /app/node_modules /app/node_modules
+# Bundle app source
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-CMD ["/usr/local/bin/yarn", "start:prod"]
+# Install production dependencies
+COPY --from=dependencies /app/node_modules ./node_modules
+
+CMD [ "node", "dist/main.js" ]
