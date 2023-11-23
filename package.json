@@ -29,7 +29,7 @@
     "@nestjs/core": "^10.0.5",
     "@nestjs/platform-express": "^10.0.5",
     "@opentelemetry/api": "^1.4.1",
-    "@opentelemetry/auto-instrumentations-node": "^0.38.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.40.0",
     "@opentelemetry/exporter-jaeger": "^1.15.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.45.0",
     "@opentelemetry/instrumentation-express": "^0.33.0",
