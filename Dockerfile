@@ -1,5 +1,5 @@
 # Base Image
-FROM node:18-alpine AS base
+FROM node:21-alpine AS base
 
 # Global install pnpm
 RUN npm i -g pnpm
